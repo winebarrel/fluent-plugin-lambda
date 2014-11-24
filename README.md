@@ -37,5 +37,5 @@ echo '{"key":"value"}' | fluent-cat lambda.foo
 When the function name is not set:
 
 ```sh
-echo '{"function_name":"my_func", "key":"value"}' | fluent-cat datadog.metric
+echo '{"function_name":"my_func", "key":"value"}' | fluent-cat lambda.bar
 ```
