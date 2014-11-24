@@ -2,6 +2,9 @@
 
 Output plugin for [AWS Lambda](http://aws.amazon.com/lambda/).
 
+[![Gem Version](https://badge.fury.io/rb/fluent-plugin-lambda.svg)](http://badge.fury.io/rb/fluent-plugin-lambda)
+[![Build Status](https://travis-ci.org/winebarrel/fluent-plugin-lambda.svg?branch=master)](https://travis-ci.org/winebarrel/fluent-plugin-lambda)
+
 ## Installation
 
     $ gem install fluent-plugin-lambda
