@@ -68,9 +68,10 @@ class Fluent::LambdaOutput < Fluent::BufferedOutput
     }.each {|tag, time, record|
       func_name = @function_name || record['function_name']
 
-      @client.invoke_async(
+      @client.invoke(
         :function_name => func_name,
-        :invoke_args => JSON.dump(record),
+        :payload => JSON.dump(record),
+        :invocation_type => 'Event',
       )
     }
   end
