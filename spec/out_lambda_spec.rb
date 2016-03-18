@@ -60,4 +60,27 @@ describe Fluent::LambdaOutput do
       end
     end
   end
+
+  context 'when a qualifier is provided' do
+    it 'invokes that alias' do
+      run_driver(qualifier: 'staging') do |d, client|
+        expect(client).to receive(:invoke).with(
+          function_name: 'my_func1',
+          payload: JSON.dump('function_name' => 'my_func1', 'key1' => 'foo' , 'key2' => 100),
+          invocation_type: 'Event',
+          qualifier: 'staging'
+        )
+
+        expect(client).to receive(:invoke).with(
+          function_name: 'my_func2',
+          payload: JSON.dump('function_name' => 'my_func2', 'key1' => 'bar' , 'key2' => 200),
+          invocation_type: 'Event',
+          qualifier: 'staging'
+        )
+
+        d.emit({'function_name' => 'my_func1', 'key1' => 'foo', 'key2' => 100}, time)
+        d.emit({'function_name' => 'my_func2', 'key1' => 'bar', 'key2' => 200}, time)
+      end
+    end
+  end
 end
