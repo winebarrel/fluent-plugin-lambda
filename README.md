@@ -21,6 +21,7 @@ Output plugin for [AWS Lambda](http://aws.amazon.com/lambda/).
   region us-east-1
   #endpoint ...
 
+  #qualifier staging
   function_name my_func
   # Pass the function name in the key of record if the function name is not set
 

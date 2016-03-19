@@ -15,6 +15,7 @@ class Fluent::LambdaOutput < Fluent::BufferedOutput
   config_param :region,                     :string, :default => nil
   config_param :endpoint,                   :string, :default => nil
   config_param :function_name,              :string, :default => nil
+  config_param :qualifier,                  :string, :default => nil
 
   config_set_default :include_time_key, false
   config_set_default :include_tag_key,  false
@@ -68,11 +69,14 @@ class Fluent::LambdaOutput < Fluent::BufferedOutput
     }.each {|tag, time, record|
       func_name = @function_name || record['function_name']
 
-      @client.invoke(
+      payload = {
         :function_name => func_name,
         :payload => JSON.dump(record),
         :invocation_type => 'Event',
-      )
+      }
+      payload[:qualifier] = @qualifier unless @qualifier.nil?
+
+      @client.invoke(payload)
     }
   end
 
