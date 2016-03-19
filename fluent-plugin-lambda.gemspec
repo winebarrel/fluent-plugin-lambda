@@ -1,7 +1,7 @@
 # coding: utf-8
 Gem::Specification.new do |spec|
   spec.name          = 'fluent-plugin-lambda'
-  spec.version       = '0.2.0'
+  spec.version       = '0.2.1'
   spec.authors       = ['Genki Sugawara']
   spec.email         = ['sugawara@cookpad.com']
   spec.description   = %q{Output plugin for AWS Lambda.}
