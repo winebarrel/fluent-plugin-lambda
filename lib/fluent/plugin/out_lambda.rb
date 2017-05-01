@@ -1,3 +1,5 @@
+require 'json'
+require 'aws-sdk-core'
 require 'fluent/plugin/output'
 
 class Fluent::Plugin::LambdaOutput < Fluent::Plugin::Output
@@ -33,8 +35,6 @@ class Fluent::Plugin::LambdaOutput < Fluent::Plugin::Output
 
   def initialize
     super
-    require 'aws-sdk-core'
-    require 'json'
   end
 
   def configure(conf)
