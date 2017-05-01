@@ -1,6 +1,8 @@
-describe Fluent::LambdaOutput do
+describe Fluent::Plugin::LambdaOutput do
+  include Fluent::Test::Helpers
+
   let(:time) {
-    Time.parse('2014-09-01 01:23:45 UTC').to_i
+    event_time('2014-09-01 01:23:45 UTC')
   }
 
   context 'when events is sent' do
@@ -18,8 +20,8 @@ describe Fluent::LambdaOutput do
           invocation_type: 'Event',
         )
 
-        d.emit({'key1' => 'foo', 'key2' => 100}, time)
-        d.emit({'key1' => 'bar', 'key2' => 200}, time)
+        d.feed(time, {'key1' => 'foo', 'key2' => 100})
+        d.feed(time, {'key1' => 'bar', 'key2' => 200})
       end
     end
   end
@@ -39,8 +41,8 @@ describe Fluent::LambdaOutput do
           invocation_type: 'Event',
         )
 
-        d.emit({'function_name' => 'my_func1', 'key1' => 'foo', 'key2' => 100}, time)
-        d.emit({'function_name' => 'my_func2', 'key1' => 'bar', 'key2' => 200}, time)
+        d.feed(time, {'function_name' => 'my_func1', 'key1' => 'foo', 'key2' => 100})
+        d.feed(time, {'function_name' => 'my_func2', 'key1' => 'bar', 'key2' => 200})
       end
     end
   end
@@ -50,8 +52,8 @@ describe Fluent::LambdaOutput do
       run_driver do |d, client|
         expect(client).to_not receive(:invoke)
 
-        d.emit({'key1' => 'foo', 'key2' => 100}, time)
-        d.emit({'key1' => 'bar', 'key2' => 200}, time)
+        d.feed(time, {'key1' => 'foo', 'key2' => 100})
+        d.feed(time, {'key1' => 'bar', 'key2' => 200})
 
         expect(d.instance.log).to receive(:warn).
            with('`function_name` key does not exist: ["test.default", 1409534625, {"key1"=>"foo", "key2"=>100}]')
@@ -78,8 +80,8 @@ describe Fluent::LambdaOutput do
           qualifier: 'staging'
         )
 
-        d.emit({'function_name' => 'my_func1', 'key1' => 'foo', 'key2' => 100}, time)
-        d.emit({'function_name' => 'my_func2', 'key1' => 'bar', 'key2' => 200}, time)
+        d.feed(time, {'function_name' => 'my_func1', 'key1' => 'foo', 'key2' => 100})
+        d.feed(time, {'function_name' => 'my_func2', 'key1' => 'bar', 'key2' => 200})
       end
     end
   end

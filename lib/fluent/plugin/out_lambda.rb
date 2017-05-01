@@ -1,12 +1,13 @@
-class Fluent::LambdaOutput < Fluent::BufferedOutput
+require 'json'
+require 'aws-sdk-core'
+require 'fluent/plugin/output'
+
+class Fluent::Plugin::LambdaOutput < Fluent::Plugin::Output
   Fluent::Plugin.register_output('lambda', self)
 
-  include Fluent::SetTimeKeyMixin
-  include Fluent::SetTagKeyMixin
+  helpers :compat_parameters, :inject
 
-  unless method_defined?(:log)
-    define_method('log') { $log }
-  end
+  DEFAULT_BUFFER_TYPE = "memory"
 
   config_param :profile,                    :string, :default => nil
   config_param :credentials_path,           :string, :default => nil
@@ -20,13 +21,17 @@ class Fluent::LambdaOutput < Fluent::BufferedOutput
   config_set_default :include_time_key, false
   config_set_default :include_tag_key,  false
 
+  config_section :buffer do
+    config_set_default :@type, DEFAULT_BUFFER_TYPE
+    config_set_default :chunk_keys, ['tag']
+  end
+
   def initialize
     super
-    require 'aws-sdk-core'
-    require 'json'
   end
 
   def configure(conf)
+    compat_parameters_convert(conf, :buffer, :inject)
     super
 
     aws_opts = {}
@@ -52,6 +57,10 @@ class Fluent::LambdaOutput < Fluent::BufferedOutput
     @client = create_client
   end
 
+  def formatted_to_msgpack_binary
+    true
+  end
+
   def format(tag, time, record)
     [tag, time, record].to_msgpack
   end
@@ -67,6 +76,7 @@ class Fluent::LambdaOutput < Fluent::BufferedOutput
         false
       end
     }.each {|tag, time, record|
+      record = inject_values_to_record(tag, time, record)
       func_name = @function_name || record['function_name']
 
       payload = {
