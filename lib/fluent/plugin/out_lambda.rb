@@ -9,13 +9,6 @@ class Fluent::Plugin::LambdaOutput < Fluent::Plugin::Output
 
   DEFAULT_BUFFER_TYPE = "memory"
 
-  include Fluent::SetTimeKeyMixin
-  include Fluent::SetTagKeyMixin
-
-  unless method_defined?(:log)
-    define_method('log') { $log }
-  end
-
   config_param :profile,                    :string, :default => nil
   config_param :credentials_path,           :string, :default => nil
   config_param :aws_key_id,                 :string, :default => nil
