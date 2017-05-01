@@ -7,6 +7,8 @@ require 'time'
 
 # Disable Test::Unit
 module Test::Unit::RunCount; def run(*); end; end
+# prevent Test::Unit's AutoRunner from executing during RSpec's rake task
+Test::Unit.run = true if defined?(Test::Unit) && Test::Unit.respond_to?(:run=)
 
 RSpec.configure do |config|
   config.before(:all) do
