@@ -1,5 +1,11 @@
-class Fluent::LambdaOutput < Fluent::BufferedOutput
+require 'fluent/plugin/output'
+
+class Fluent::Plugin::LambdaOutput < Fluent::Plugin::Output
   Fluent::Plugin.register_output('lambda', self)
+
+  helpers :compat_parameters
+
+  DEFAULT_BUFFER_TYPE = "memory"
 
   include Fluent::SetTimeKeyMixin
   include Fluent::SetTagKeyMixin
@@ -20,6 +26,11 @@ class Fluent::LambdaOutput < Fluent::BufferedOutput
   config_set_default :include_time_key, false
   config_set_default :include_tag_key,  false
 
+  config_section :buffer do
+    config_set_default :@type, DEFAULT_BUFFER_TYPE
+    config_set_default :chunk_keys, ['tag']
+  end
+
   def initialize
     super
     require 'aws-sdk-core'
@@ -27,6 +38,7 @@ class Fluent::LambdaOutput < Fluent::BufferedOutput
   end
 
   def configure(conf)
+    compat_parameters_convert(conf, :buffer)
     super
 
     aws_opts = {}
@@ -50,6 +62,10 @@ class Fluent::LambdaOutput < Fluent::BufferedOutput
     super
 
     @client = create_client
+  end
+
+  def formatted_to_msgpack_binary
+    true
   end
 
   def format(tag, time, record)
