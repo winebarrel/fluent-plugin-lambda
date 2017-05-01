@@ -5,7 +5,7 @@ require 'fluent/plugin/output'
 class Fluent::Plugin::LambdaOutput < Fluent::Plugin::Output
   Fluent::Plugin.register_output('lambda', self)
 
-  helpers :compat_parameters
+  helpers :compat_parameters, :inject
 
   DEFAULT_BUFFER_TYPE = "memory"
 
@@ -38,7 +38,7 @@ class Fluent::Plugin::LambdaOutput < Fluent::Plugin::Output
   end
 
   def configure(conf)
-    compat_parameters_convert(conf, :buffer)
+    compat_parameters_convert(conf, :buffer, :inject)
     super
 
     aws_opts = {}
@@ -83,6 +83,7 @@ class Fluent::Plugin::LambdaOutput < Fluent::Plugin::Output
         false
       end
     }.each {|tag, time, record|
+      record = inject_values_to_record(tag, time, record)
       func_name = @function_name || record['function_name']
 
       payload = {
