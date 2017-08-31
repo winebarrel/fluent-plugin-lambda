@@ -1,5 +1,5 @@
 require 'json'
-require 'aws-sdk-core'
+require 'aws-sdk-lambda'
 require 'fluent/plugin/output'
 
 class Fluent::Plugin::LambdaOutput < Fluent::Plugin::Output
