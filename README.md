@@ -23,6 +23,8 @@ Output plugin for [AWS Lambda](http://aws.amazon.com/lambda/).
 
   #qualifier staging
   function_name my_func
+  # Set 'group_events' true for making batch requests
+  #group_events true
   # Pass the function name in the key of record if the function name is not set
 
   # include_time_key false
