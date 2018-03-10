@@ -44,7 +44,7 @@ class Fluent::Plugin::LambdaOutput < Fluent::Plugin::Output
     end
 
     if @group_events
-      raise Fluent::ConfigError, "could not run bulk without 'function_name'" if @function_name.nil?
+      raise Fluent::ConfigError, "could not group events without 'function_name'" if @function_name.nil?
     end
 
     aws_opts[:access_key_id] = @aws_key_id if @aws_key_id
@@ -72,7 +72,7 @@ class Fluent::Plugin::LambdaOutput < Fluent::Plugin::Output
   def write(chunk)
     chunk = chunk.to_enum(:msgpack_each)
     if @group_events
-      bulk_write(chunk)
+      write_batch(chunk)
     else
       write_by_one(chunk)
     end
@@ -88,7 +88,7 @@ class Fluent::Plugin::LambdaOutput < Fluent::Plugin::Output
     Aws::Lambda::Client.new
   end
 
-  def bulk_write(chunk) 
+  def write_batch(chunk) 
     func_name = @function_name
     chunk.group_by {|tag, time, record| 
       tag
