@@ -2,8 +2,10 @@
 
 Output plugin for [AWS Lambda](http://aws.amazon.com/lambda/).
 
-[![Gem Version](https://badge.fury.io/rb/fluent-plugin-lambda.svg)](http://badge.fury.io/rb/fluent-plugin-lambda)
-[![Build Status](https://travis-ci.org/winebarrel/fluent-plugin-lambda.svg?branch=master)](https://travis-ci.org/winebarrel/fluent-plugin-lambda)
+[![GitHub version](https://badge.fury.io/gh/VAveryanov8%2Ffluent-plugin-lambda-ext.svg)](https://badge.fury.io/gh/VAveryanov8%2Ffluent-plugin-lambda-ext)
+[![Build Status](https://travis-ci.org/VAveryanov8/fluent-plugin-lambda-ext.svg?branch=master)](https://travis-ci.org/VAveryanov8/fluent-plugin-lambda-ext)
+
+**This is a fork of [fluent-plugin-lambda](https://github.com/winebarrel/fluent-plugin-lambda)**
 
 ## Installation
 
