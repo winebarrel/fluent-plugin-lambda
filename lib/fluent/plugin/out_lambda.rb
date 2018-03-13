@@ -17,6 +17,7 @@ class Fluent::Plugin::LambdaOutput < Fluent::Plugin::Output
   config_param :endpoint,                   :string, :default => nil
   config_param :function_name,              :string, :default => nil
   config_param :qualifier,                  :string, :default => nil
+  config_param :group_events,		            :bool,   :default => false
 
   config_set_default :include_time_key, false
   config_set_default :include_tag_key,  false
@@ -40,6 +41,10 @@ class Fluent::Plugin::LambdaOutput < Fluent::Plugin::Output
       credentials_opts[:path] = @credentials_path if @credentials_path
       credentials = Aws::SharedCredentials.new(credentials_opts)
       aws_opts[:credentials] = credentials
+    end
+
+    if @group_events
+      raise Fluent::ConfigError, "could not group events without 'function_name'" if @function_name.nil?
     end
 
     aws_opts[:access_key_id] = @aws_key_id if @aws_key_id
@@ -66,7 +71,41 @@ class Fluent::Plugin::LambdaOutput < Fluent::Plugin::Output
 
   def write(chunk)
     chunk = chunk.to_enum(:msgpack_each)
+    if @group_events
+      write_batch(chunk)
+    else
+      write_by_one(chunk)
+    end
+  end
 
+  private
+
+  def configure_aws(options)
+    Aws.config.update(options)
+  end
+
+  def create_client
+    Aws::Lambda::Client.new
+  end
+
+  def write_batch(chunk) 
+    func_name = @function_name
+    chunk.group_by {|tag, time, record| 
+      tag
+    }.each{|key, group|
+      events = []
+      group.each do |time, tag, record|
+        events << record
+      end
+      @client.invoke({
+        :function_name => func_name,
+        :payload => JSON.dump(events),
+        :invocation_type => 'Event',
+      })
+    }
+  end
+
+  def write_by_one(chunk)
     chunk.select {|tag, time, record|
       if @function_name or record['function_name']
         true
@@ -89,13 +128,4 @@ class Fluent::Plugin::LambdaOutput < Fluent::Plugin::Output
     }
   end
 
-  private
-
-  def configure_aws(options)
-    Aws.config.update(options)
-  end
-
-  def create_client
-    Aws::Lambda::Client.new
-  end
 end
